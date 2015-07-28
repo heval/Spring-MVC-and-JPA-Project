@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 public class UserController {
@@ -18,20 +19,35 @@ public class UserController {
     IUserService service;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView registerPageLoad(ModelAndView modelAndView) {
+    public ModelAndView login(ModelAndView modelAndView) {
+        User user=new User();
+        modelAndView.addObject("login", user);
+        modelAndView.setViewName("login");
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public ModelAndView register(ModelAndView modelAndView) {
         User user=new User();
         modelAndView.addObject("register", user);
         modelAndView.setViewName("register");
         return modelAndView;
     }
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ModelAndView register(@ModelAttribute @Valid User user, BindingResult bindingResult) {
+    @RequestMapping(value = "/newuser", method = RequestMethod.POST)
+    public ModelAndView createUser(@ModelAttribute @Valid User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            service.saveUser(user);
-            return new ModelAndView("register");
+            return new ModelAndView("redirect:/register");
         } else {
-            return new ModelAndView("redirect:/");
+            service.saveUser(user);
+            return new ModelAndView("redirect:/users");
         }
+    }
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    public ModelAndView getUserList(ModelAndView modelAndView) {
+        List<User> userList=service.getUserList();
+        modelAndView.addObject("userList",userList);
+        modelAndView.setViewName("users");
+        return modelAndView;
     }
 }
