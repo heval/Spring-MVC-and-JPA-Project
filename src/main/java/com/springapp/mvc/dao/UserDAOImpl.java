@@ -5,6 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 
 /**
@@ -32,11 +35,15 @@ public class UserDAOImpl implements IUserDAO {
 
     @Override
     public User getUser(int userId) {
-        return null;
+        return entityManager.find(User.class,userId);
     }
 
     @Override
     public List<User> getUserList() {
-        return null;
+        CriteriaBuilder builder=entityManager.getCriteriaBuilder();
+        CriteriaQuery<User> query=builder.createQuery(User.class);
+        query.select(query.from(User.class));
+        TypedQuery<User> typedQuery=entityManager.createQuery(query);
+        return typedQuery.getResultList();
     }
 }
